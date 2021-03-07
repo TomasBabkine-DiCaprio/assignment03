@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomas Babkine-Di Caprio - IMD3901 - Assignment 03</title>
+    <meta name="description" content="Tomas Babkine-Di Caprio - IMD3901 - Assignment 03">
+
+    <!-- AFrame -->
+    <script src="/js/aframe.min.js"></script>
+
+    <!-- Networking (socket.io) -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- loading in our js file with custom component -->
+    <script src="/js/interact-box.js"></script>
+    <script src="/js/other-player.js"></script>
+
+    <!-- Environment -->
+    <script src="/js/aframe-environment-component.min.js"></script>
+
+    <!-- Physics module -->
+    <script src="http://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
+
+    <!-- Support for mobile -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+
+</head>
+
+<body>
+    <!-- A-Frame scene -->
+    <div style="position:relative;">
+        <a-scene id="sceneEntity" physics>
+
+            <!-- Camera -->
+            <a-entity>
+                <a-camera id="cameraId" position="0 1.6 9.5" look-controls='pointerLockEnabled: true'>
+                    <a-cursor></a-cursor>
+                </a-camera>
+            </a-entity>
+
+            <!-- Player -->
+            <a-entity player-handler></a-entity>
+
+            <!-- Buttons and their pedestal -->
+            <a-entity id='pedestalId' position="0 1 8.5">
+                <!-- Pedestal -->
+                <a-entity geometry="primitive: box; height: 0.4; width: 1.5; depth: 0.5"
+                position="0 0 0" material="color: gray"
+                ></a-entity>
+                <!-- Buttons from left to right -->
+                <a-entity   position="0 0.4 0"
+                            text="value: Draw; align: center" 
+                            scale="1.5 1.5 1.5">
+                </a-entity>
+                <a-entity   id="draw_button" class="button"   position="0 0.2 0"          
+                    spawn-house geometry="primitive:cylinder; radius:0.15; height: 0.2;" 
+                    material="color:rgb(255, 100, 100);"   scale="0.5 0.5 0.5"
+                    animation__mouseenter="property:material.color; type:color; to:rgb(255,0,0); startEvents:mouseenter; dur:200;"
+                    animation__mouseleave="property:material.color; type:color; to:rgb(255,100,100); startEvents:mouseleave; dur:200;"
+                    animation__click="property: position; from: 0 0.15 0; to: 0 0.2 0; startEvents:click; dur: 300;"
+                    sound="src: url(assets/click.mp3); on: click">
+                </a-entity>
+                <a-entity   position="-0.50 0.4 0"
+                            text="value: Start; align: center" 
+                            scale="1.5 1.5 1.5">
+                </a-entity>
+                <a-entity   id="start_button" class="button"   position="-0.50 0.2 0"          
+                    spawn-house geometry="primitive:cylinder; radius:0.15; height: 0.2;" 
+                    material="color:rgb(255, 100, 100);"   scale="0.5 0.5 0.5"
+                    animation__mouseenter="property:material.color; type:color; to:rgb(255,0,0); startEvents:mouseenter; dur:200;"
+                    animation__mouseleave="property:material.color; type:color; to:rgb(255,100,100); startEvents:mouseleave; dur:200;"
+                    animation__click="property: position; from: -0.5 0.15 0; to: -0.5 0.2 0; startEvents:click; dur: 300;"
+                    sound="src: url(assets/click.mp3); on: click">
+                </a-entity>
+                <a-entity   position="0.5 0.4 0"
+                            text="value: Stay; align: center" 
+                            scale="1.5 1.5 1.5">
+                </a-entity>
+                <a-entity   id="stay_button" class="button"   position="0.5 0.2 0"          
+                    spawn-block geometry="primitive:cylinder; radius:0.15; height: 0.2;" 
+                    material="color:rgb(255, 100, 100);"   scale="0.5 0.5 0.5"
+                    animation__mouseenter="property:material.color; type:color; to:rgb(255,0,0); startEvents:mouseenter; dur:200;"
+                    animation__mouseleave="property:material.color; type:color; to:rgb(255,100,100); startEvents:mouseleave; dur:200;"
+                    animation__click="property: position; from: 0.5 0.15 0; to: 0.5 0.2 0; startEvents:click; dur: 300;"
+                    sound="src: url(assets/click.mp3); on: click">
+                </a-entity>
+                
+            </a-entity>
+
+            <!-- Environment -->
+            <a-entity environment="preset:forest;"></a-entity>
+            
+        </a-scene>
+        <!-- UI Overlays -->
+        <div style="position:absolute; top:20px; left:20px; z-index:1000;">
+            <!-- UI -->
+            <h2 id="messageBoard">Waiting for a player to join...</h2>
+        </div>
+        <div style="position:absolute; top:50px; left:20px; z-index:1000;">
+            <!-- UI -->
+            <h2 id="currentHand">Your current hand value:</h2>
+        </div>
+    </div>
+    <!-- End of A-Frame scene -->
+
+    <script>
+        // Necessary variables
+        let messageBoard = document.getElementById('messageBoard');
+        let currentHandBoard = document.getElementById('currentHand');
+        let socket = io();
+
+        socket.on('connect', (userData) => {
+            // Send the user ID to the server
+            socket.emit("dealerIsConnected", {socketID:socket.id})
+
+            // When two players have joined!
+            // The dealer gets to begin game
+            socket.on('players_ready', (data) => {
+                messageBoard.innerHTML = "Click the start button to begin game.";
+                document.querySelector('#start_button').addEventListener('click', function() {
+                    messageBoard.innerHTML = "Drawing cards...";
+                    socket.emit('startGame');
+                });
+            });
+
+            // When the score has to be updated
+            socket.on('update_score', (data) => {
+                currentHand.innerHTML = "Your current hand value: " + data.dealerHandValue;
+                messageBoard.innerHTML = 'Waiting on player to draw or stay.';
+                // Buttons for demanding a new card, or staying
+                document.querySelector('#draw_button').addEventListener('click', function() {
+                    socket.emit('hit_me', {socketID:socket.id});
+                });
+                document.querySelector('#stay_button').addEventListener('click', function() {
+                    socket.emit('stay');
+                });
+            });
+
+            // When the player decided to stay
+            socket.on('player_stayed', () => {
+                messageBoard.innerHTML = "Player has stayed, please draw.";
+            });
+
+            // When someone has won
+            socket.on('player_won', () => {
+                // Remove buttons for demanding a new card, or staying
+                document.querySelector('#hitme_button').removeEventListener('click', function() {});
+                document.querySelector('#stay_button').addEventListener('click', function() {});
+
+                messageBoard.innerHTML = 'The player won! Start a new game.';
+                currentHand.innerHTML = ' ';
+            });
+            // When someone has won
+            socket.on('dealer_won', () => {
+                // Remove buttons for demanding a new card, or staying
+                document.querySelector('#draw_button').removeEventListener('click', function() {});
+                document.querySelector('#stay_button').addEventListener('click', function() {});
+
+                messageBoard.innerHTML = 'You won! Start a new game.';
+                currentHand.innerHTML = ' ';
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>

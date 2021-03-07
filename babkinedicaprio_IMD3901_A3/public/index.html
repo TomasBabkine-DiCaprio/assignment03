@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Tomas Babkine-Di Caprio - IMD3901 - Assignment 03</title>
+      <meta name="description" content="Tomas Babkine-Di Caprio - IMD3901 - Assignment 03">
+
+      <!-- Google fonts -->
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    </head>
+    <style>
+      .intro {
+        margin: 3em auto;
+        width: 600px;
+        height: auto;
+        padding: 20px;
+        border-radius: 15px;
+
+        font-family: Helvetica, sans-serif;
+        -webkit-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.1), -5px -5px 20px 0px rgba(0,0,0,0.1); 
+        box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.1), -5px -5px 20px 0px rgba(0,0,0,0.1);
+      }
+      h2 {
+        font-weight: 100;
+        font-size: 20px;
+        line-height: 1.4;
+        margin-top: 0;
+      } 
+      h3 {
+        font-weight: 100;
+        font-size: 14px;
+        line-height: 1.4;
+      } 
+      
+      .enterExperienceButton {
+        margin-top: 40px;
+        padding:10px;
+        border-radius: 15px;
+        text-decoration: none;
+        font-weight: 100;
+        color: #1b1b1b;
+
+        background-color: white;
+        border:1px solid #4c4c4c;
+
+        -webkit-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.1), -5px -5px 20px 0px rgba(0,0,0,0.1); 
+        box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.1), -5px -5px 20px 0px rgba(0,0,0,0.1);
+
+        transition: background-color 0.5s, color 0.2s, border-color 0.2s;
+
+        display:block;
+        width: 140px;
+      }
+      .enterExperienceButton:hover {
+        background-color: #4c4c4c;
+        color: rgb(255, 255, 255);
+      }
+    </style>
+    <body>
+      <section class="intro">
+        <h2>Tomas Babkine-Di Caprio<br>Assignment 3 - Multi-User Interactions<br>Presented to Anthony Scavarelli<br>IMD3901 - Winter 2021</h2>
+
+        <h3>What I did</h3>
+        <h3>For this assignment, I created a virtual blackjack game! Pick your role, dealer or player. Instructions on screen will guide you through the game!</h3>
+
+        <h3>What was challenging</h3>
+        <h3>Understanding how to relay information between the server and the client was quite tricky at first. Furthermore, designing networking architectures requires quite a lot of planning, if I had to do it again, I would sit down with pen and paper and define my functions and database structure before coding.</h3>
+        
+        <h3>What went well</h3>
+        <h3>Once I understood how socket.io works, it was fun and predictable to develop a project using it.</h3>
+
+        <h3>Sound effects by ZapSplats</h3>
+
+        <h3>Github: https://github.com/TomasBabkine-DiCaprio/assignment03</h3>
+        <div>
+          <a class="enterExperienceButton" href="dealer.html">Become the dealer</a>
+          <a class="enterExperienceButton" href="player.html">Become the player</a>
+        </div>
+      </section>
+    </body>
+</html>
